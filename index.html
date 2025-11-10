@@ -1,158 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>🎁 Surpresa para Carol Dutra 🎁</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0; padding: 0;
-      overflow: hidden;
-      background: radial-gradient(circle at top, #2d2150 0%, #130d24 80%);
-      color: #fff;
-      font-family: "Segoe UI", sans-serif;
-      height: 100vh;
-    }
-    #petalas {
-      position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      z-index: 0;
-    }
-    .container {
-      position: relative; z-index: 2;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      min-height: 100vh;
-      text-align: center;
-    }
-    #giftBox {
-      width: 140px; height: 140px;
-      background: linear-gradient(135deg, #b980fa, #7c4dff);
-      border-radius: 20px;
-      position: relative;
-      cursor: pointer;
-      box-shadow: 0 0 30px #9b5eea99;
-      transition: transform 0.3s ease;
-      animation: pulse 2s infinite ease-in-out;
-    }
-    #giftBox:hover { transform: scale(1.1); }
-    #giftBox::before {
-      content: "";
-      position: absolute; top: 0; left: 50%;
-      width: 16px; height: 100%;
-      background: #fff;
-      transform: translateX(-50%);
-      border-radius: 8px;
-    }
-    #giftBox::after {
-      content: "";
-      position: absolute; top: 50%;
-      left: 0; width: 100%; height: 16px;
-      background: #fff;
-      transform: translateY(-50%);
-      border-radius: 8px;
-    }
-    @keyframes pulse {
-      0%,100% { box-shadow: 0 0 25px #a780ff88; }
-      50% { box-shadow: 0 0 40px #caa0ffcc; }
-    }
-    #textoAnimado {
-      display: none;
-      font-size: 1.9rem;
-      max-width: 700px;
-      background: rgba(30, 20, 55, 0.85);
-      border-radius: 22px;
-      box-shadow: 0 0 25px #a175fa55;
-      padding: 34px 28px;
-      text-align: left;
-      line-height: 1.5;
-      letter-spacing: 0.01em;
-      animation: fadeIn 1.5s forwards;
-    }
-    .cursor { color: #b980fa; animation: blink 0.7s infinite; }
-    @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0;} }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);} }
-    @media (max-width:700px){
-      #textoAnimado{font-size:1.1rem;padding:14px 10px;}
-      #giftBox{width:110px;height:110px;}
-    }
-  </style>
+<meta charset="UTF-8">
+<title>🎁 Surpresa para Carol Dutra 🎁</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<style>
+html,body{margin:0;padding:0;background:#1a112b;color:#fff;font-family:"Segoe UI",sans-serif;overflow:hidden;height:100vh;}
+#petalas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#texto{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2;font-size:1.8rem;width:80%;max-width:700px;opacity:0;transition:opacity 1.2s ease;}
+#mensagemFinal{position:fixed;bottom:10%;left:50%;transform:translateX(-50%);font-size:2rem;color:#fff;text-shadow:0 0 20px #c79eff;opacity:0;z-index:5;animation:flutuar 5s infinite ease-in-out;}
+@keyframes flutuar{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,-10px);}}
+@keyframes confete{0%{transform:translateY(0) rotate(0);}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.confete{position:fixed;width:10px;height:10px;border-radius:50%;animation:confete 3s linear forwards;}
+</style>
 </head>
 <body>
-  <canvas id="petalas"></canvas>
-  <audio id="musica" src="lofi.mp3" preload="auto"></audio>
+<canvas id="petalas"></canvas>
+<audio id="musica" src="lofi.mp3" preload="auto"></audio>
+<div id="texto"></div>
+<div id="mensagemFinal">Feliz aniversário, Carol 💜</div>
 
-  <div class="container">
-    <div id="giftBox" title="Clique para abrir 🎁"></div>
-    <div id="textoAnimado"></div>
-  </div>
+<script>
+// --- pétalas --- //
+const canvas=document.getElementById("petalas"),ctx=canvas.getContext("2d");
+let w=window.innerWidth,h=window.innerHeight;canvas.width=w;canvas.height=h;
+const petalas=[];function Petala(){this.x=Math.random()*w;this.y=Math.random()*h;this.s=10+Math.random()*20;this.spd=0.5+Math.random();this.wd=-0.7+Math.random()*1.4;this.a=Math.random()*2*Math.PI;this.as=0.01+Math.random()*0.02;}
+Petala.prototype.up=function(){this.x+=this.wd+Math.sin(this.a)*0.5;this.y+=this.spd;this.a+=this.as;if(this.y>h){this.y=-10;this.x=Math.random()*w;}};Petala.prototype.dr=function(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.a);ctx.fillStyle="rgba(162,89,247,0.9)";ctx.beginPath();ctx.ellipse(0,0,this.s/2,this.s,0,0,2*Math.PI);ctx.fill();ctx.restore();};
+for(let i=0;i<40;i++)petalas.push(new Petala());
+function loop(){ctx.clearRect(0,0,w,h);petalas.forEach(p=>{p.up();p.dr();});requestAnimationFrame(loop);}loop();
+window.onresize=()=>{w=window.innerWidth;h=window.innerHeight;canvas.width=w;canvas.height=h;};
 
-  <script src="petalas.js"></script>
-  <script>
-    const frases = [
-      "Surpresa feita para Carol Dutra 💜",
-      "(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva... ainda tentando decorar!)",
-      "",
-      "Resolvi fazer algo diferente, porque uma mensagem no WhatsApp não mostra o tanto que tem sido bom te conhecer.",
-      "",
-      "Primeiro: o cinema. Você transformou o simples ato de assistir em um momento meu favorito — talvez porque com você, até o silêncio é confortável.",
-      "",
-      "E esse sorriso? Existe alguma lei da física que explique como ele muda o dia de quem tá por perto?",
-      "",
-      "As conversas, as brincadeiras, os 'boas' e 'sdds'… viraram parte boa da rotina. E sinceramente, espero que continuem assim.",
-      "",
-      "Hoje é seu dia, mas parece que quem ganhou o presente fui eu por te conhecer.",
-      "",
-      "Curte muito, Carol. 🌿 Que esse novo ciclo venha leve, bonito e cheio de sorte (igual aquele trevo de quatro folhas).",
-      "",
-      "Assinado: o culpado por essa página 😏"
-    ];
-
-    const gift = document.getElementById("giftBox");
-    const texto = document.getElementById("textoAnimado");
-    const musica = document.getElementById("musica");
-    let atual = 0, char = 0, output = "";
-
-    gift.addEventListener("click", () => {
-      gift.style.display = "none";
-      texto.style.display = "block";
-      setTimeout(() => musica.play(), 500);
-      mostrarFrase();
-    });
-
-    function mostrarFrase() {
-      if (atual < frases.length) {
-        let frase = frases[atual];
-        if (char < frase.length) {
-          output += frase.charAt(char);
-          texto.innerHTML = output + "<span class='cursor'>|</span>";
-          char++;
-          setTimeout(mostrarFrase, 22);
-        } else {
-          output += "<br><br>";
-          texto.innerHTML = output;
-          char = 0; atual++;
-          setTimeout(mostrarFrase, frase === "" ? 350 : 1000);
-        }
-      } else {
-        const evt = new Event("finalTexto");
-        window.dispatchEvent(evt);
-        fadeOutAudio();
-      }
-    }
-
-    function fadeOutAudio() {
-      let fade = setInterval(() => {
-        if (musica.volume > 0.02) musica.volume -= 0.02;
-        else { musica.volume = 0; clearInterval(fade); }
-      }, 200);
-    }
-
-    // iniciar confetes no final
-    window.addEventListener("finalTexto", () => {
-      window.dispatchEvent(new Event("animationend"));
-    });
-  </script>
+// --- texto --- //
+const frases=[
+"Surpresa feita para Carol Dutra 💜",
+"(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva...)",
+"Resolvi fazer algo diferente, porque mensagem no WhatsApp não mostra o tanto que é bom te conhecer.",
+"O cinema virou meu novo hobbie — talvez porque com você, até o silêncio é confortável.",
+"E esse sorriso? Muda o dia de quem tá por perto.",
+"As conversas, as brincadeiras, os 'boas' e 'sdds'… viraram parte boa da rotina.",
+"Hoje é seu dia, mas parece que quem ganhou o presente fui eu por te conhecer.",
+"Curte muito, Carol. Que esse novo ciclo venha leve e bonito, igual o trevo de quatro folhas 🍀.",
+"Assinado: o culpado por essa página 😏"
+];
+const texto=document.getElementById("texto"),musica=document.getElementById("musica"),msg=document.getElementById("mensagemFinal");
+let i=0;
+function mostrar(){if(i<frases.length){texto.innerHTML=frases[i];texto.style.opacity=1;setTimeout(()=>{texto.style.opacity=0;i++;setTimeout(mostrar,1300);},4500);}else final();}
+function final(){msg.style.opacity=1;confetes();setTimeout(()=>{musica.volume=0.2;},1000);}
+function confetes(){for(let i=0;i<100;i++){const c=document.createElement("div");c.className="confete";c.style.left=Math.random()*100+"vw";c.style.background=`hsl(${Math.random()*360},80%,60%)`;c.style.animationDuration=(2+Math.random()*3)+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),4000);}}
+setTimeout(()=>{musica.play();mostrar();},800);
+</script>
 </body>
 </html>
