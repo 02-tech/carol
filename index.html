@@ -6,49 +6,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 <style>
-html,body{margin:0;padding:0;background:#1a112b;color:#fff;font-family:"Segoe UI",sans-serif;overflow:hidden;height:100vh;}
-#petalas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
-#texto{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2;font-size:1.8rem;width:80%;max-width:700px;opacity:0;transition:opacity 1.2s ease;}
-#mensagemFinal{position:fixed;bottom:10%;left:50%;transform:translateX(-50%);font-size:2rem;color:#fff;text-shadow:0 0 20px #c79eff;opacity:0;z-index:5;animation:flutuar 5s infinite ease-in-out;}
-@keyframes flutuar{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,-10px);}}
-@keyframes confete{0%{transform:translateY(0) rotate(0);}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
-.confete{position:fixed;width:10px;height:10px;border-radius:50%;animation:confete 3s linear forwards;}
+html,body{margin:0;padding:0;background:#1a112b;color:#fff;font-family:"Segoe UI",sans-serif;overflow:hidden;height:100vh}
+#petalas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.container{position:relative;z-index:2;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+#giftBox{width:140px;height:140px;border-radius:22px;cursor:pointer;background:linear-gradient(135deg,#b980fa,#7c4dff);box-shadow:0 0 30px #9b5eea99;position:relative;animation:pulse 2s infinite}
+#giftBox:hover{transform:scale(1.06);transition:.2s}
+#giftBox::before,#giftBox::after{content:"";position:absolute;background:#fff;border-radius:8px}
+#giftBox::before{top:0;left:50%;width:16px;height:100%;transform:translateX(-50%)}
+#giftBox::after{left:0;top:50%;width:100%;height:16px;transform:translateY(-50%)}
+#hint{font-size:1rem;opacity:.9}
+@keyframes pulse{0%,100%{box-shadow:0 0 24px #a780ff88}50%{box-shadow:0 0 44px #caa0ffcc}}
+#texto{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2;font-size:1.8rem;width:80%;max-width:720px;opacity:0;transition:opacity 1.2s}
+#mensagemFinal{position:fixed;bottom:10%;left:50%;transform:translateX(-50%);font-size:2rem;text-shadow:0 0 20px #c79eff;opacity:0;z-index:5;animation:flutuar 5s infinite ease-in-out}
+@keyframes flutuar{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-10px)}}
+@keyframes confete{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.confete{position:fixed;width:10px;height:10px;border-radius:50%;animation:confete 3.5s linear forwards}
+@media (max-width:700px){#texto{font-size:1.15rem}#giftBox{width:110px;height:110px}#mensagemFinal{font-size:1.35rem}}
 </style>
 </head>
 <body>
 <canvas id="petalas"></canvas>
 <audio id="musica" src="lofi.mp3" preload="auto"></audio>
-<div id="texto"></div>
+
+<div class="container" id="inicio">
+  <div id="giftBox" title="Clique para abrir 🎁"></div>
+  <div id="hint">Toque para abrir o presente e aumentar o volume 🎧</div>
+</div>
+
+<div id="texto" aria-live="polite"></div>
 <div id="mensagemFinal">Feliz aniversário, Carol 💜</div>
 
 <script>
-// --- pétalas --- //
-const canvas=document.getElementById("petalas"),ctx=canvas.getContext("2d");
-let w=window.innerWidth,h=window.innerHeight;canvas.width=w;canvas.height=h;
-const petalas=[];function Petala(){this.x=Math.random()*w;this.y=Math.random()*h;this.s=10+Math.random()*20;this.spd=0.5+Math.random();this.wd=-0.7+Math.random()*1.4;this.a=Math.random()*2*Math.PI;this.as=0.01+Math.random()*0.02;}
-Petala.prototype.up=function(){this.x+=this.wd+Math.sin(this.a)*0.5;this.y+=this.spd;this.a+=this.as;if(this.y>h){this.y=-10;this.x=Math.random()*w;}};Petala.prototype.dr=function(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.a);ctx.fillStyle="rgba(162,89,247,0.9)";ctx.beginPath();ctx.ellipse(0,0,this.s/2,this.s,0,0,2*Math.PI);ctx.fill();ctx.restore();};
-for(let i=0;i<40;i++)petalas.push(new Petala());
-function loop(){ctx.clearRect(0,0,w,h);petalas.forEach(p=>{p.up();p.dr();});requestAnimationFrame(loop);}loop();
-window.onresize=()=>{w=window.innerWidth;h=window.innerHeight;canvas.width=w;canvas.height=h;};
+// ---------- PÉTALAS ----------
+const canvas = document.getElementById("petalas"), ctx = canvas.getContext("2d");
+let w = innerWidth, h = innerHeight; canvas.width = w; canvas.height = h;
+function Petala(){this.x=Math.random()*w;this.y=Math.random()*h;this.s=10+Math.random()*20;this.spd=0.5+Math.random();this.wd=-0.7+Math.random()*1.4;this.a=Math.random()*2*Math.PI;this.as=0.01+Math.random()*0.02}
+Petala.prototype.up=function(){this.x+=this.wd+Math.sin(this.a)*0.5;this.y+=this.spd;this.a+=this.as;if(this.y>h){this.y=-10;this.x=Math.random()*w}};
+Petala.prototype.dr=function(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.a);ctx.fillStyle="rgba(162,89,247,0.9)";ctx.beginPath();ctx.ellipse(0,0,this.s/2,this.s,0,0,2*Math.PI);ctx.fill();ctx.restore()};
+const petalas = Array.from({length:44},()=>new Petala());
+(function loop(){ctx.clearRect(0,0,w,h);petalas.forEach(p=>{p.up();p.dr()});requestAnimationFrame(loop)})();
+addEventListener("resize",()=>{w=innerWidth;h=innerHeight;canvas.width=w;canvas.height=h});
 
-// --- texto --- //
-const frases=[
-"Surpresa feita para Carol Dutra 💜",
-"(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva...)",
-"Resolvi fazer algo diferente, porque mensagem no WhatsApp não mostra o tanto que é bom te conhecer.",
-"O cinema virou meu novo hobbie — talvez porque com você, até o silêncio é confortável.",
-"E esse sorriso? Muda o dia de quem tá por perto.",
-"As conversas, as brincadeiras, os 'boas' e 'sdds'… viraram parte boa da rotina.",
-"Hoje é seu dia, mas parece que quem ganhou o presente fui eu por te conhecer.",
-"Curte muito, Carol. Que esse novo ciclo venha leve e bonito, igual o trevo de quatro folhas 🍀.",
-"Assinado: o culpado por essa página 😏"
+// ---------- TEXTO EM MODO APRESENTAÇÃO ----------
+const frases = [
+  "Surpresa feita para Carol Dutra 💜",
+  "(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva...)",
+  "Resolvi fazer algo diferente, porque mensagem no WhatsApp não mostra o tanto que é bom te conhecer.",
+  "O cinema virou meu novo hobbie — talvez porque com você, até o silêncio é confortável.",
+  "E esse sorriso? Muda o dia de quem tá por perto.",
+  "As conversas, as brincadeiras, os 'boas' e 'sdds'… viraram parte boa da rotina.",
+  "Hoje é seu dia, mas parece que quem ganhou o presente fui eu por te conhecer.",
+  "Curte muito, Carol. Que esse novo ciclo venha leve e bonito, igual o trevo de quatro folhas 🍀.",
+  "Assinado: o culpado por essa página 😏"
 ];
-const texto=document.getElementById("texto"),musica=document.getElementById("musica"),msg=document.getElementById("mensagemFinal");
-let i=0;
-function mostrar(){if(i<frases.length){texto.innerHTML=frases[i];texto.style.opacity=1;setTimeout(()=>{texto.style.opacity=0;i++;setTimeout(mostrar,1300);},4500);}else final();}
-function final(){msg.style.opacity=1;confetes();setTimeout(()=>{musica.volume=0.2;},1000);}
-function confetes(){for(let i=0;i<100;i++){const c=document.createElement("div");c.className="confete";c.style.left=Math.random()*100+"vw";c.style.background=`hsl(${Math.random()*360},80%,60%)`;c.style.animationDuration=(2+Math.random()*3)+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),4000);}}
-setTimeout(()=>{musica.play();mostrar();},800);
+
+const gift = document.getElementById("giftBox");
+const texto = document.getElementById("texto");
+const musica = document.getElementById("musica");
+const msg = document.getElementById("mensagemFinal");
+
+let idx = 0;
+let playing = false;
+
+gift.addEventListener("click", async () => {
+  // inicia áudio por gesto do usuário
+  try {
+    musica.volume = 0.8;
+    await musica.play();
+    playing = true;
+  } catch(e) {
+    // fallback: em alguns navegadores precisa de interação extra
+    musica.muted = false;
+    musica.play().catch(()=>{});
+  }
+  // esconde caixa e inicia apresentação
+  document.getElementById("inicio").style.display = "none";
+  texto.style.opacity = 0;
+  mostrar();
+});
+
+function mostrar(){
+  if(idx < frases.length){
+    texto.innerHTML = frases[idx];
+    // fade in
+    requestAnimationFrame(()=> texto.style.opacity = 1);
+    // mantém 4.5s, depois fade out e avança
+    setTimeout(()=>{
+      texto.style.opacity = 0;
+      idx++;
+      setTimeout(mostrar, 1200);
+    }, 4500);
+  } else {
+    final();
+  }
+}
+
+// ---------- FINAL: CONFETES + MENSAGEM ----------
+function final(){
+  msg.style.opacity = 1;
+  confetes();
+  // fade-out suave do áudio ao longo de ~8s
+  if (playing){
+    const step = setInterval(()=>{
+      musica.volume = Math.max(0, musica.volume - 0.02);
+      if(musica.volume <= 0){ clearInterval(step); }
+    }, 200);
+  }
+}
+function confetes(){
+  for(let i=0;i<120;i++){
+    const c = document.createElement("div");
+    c.className = "confete";
+    c.style.left = Math.random()*100 + "vw";
+    c.style.background = `hsl(${Math.random()*360},80%,60%)`;
+    c.style.animationDuration = (2.6 + Math.random()*3) + "s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 4200);
+  }
+}
 </script>
 </body>
 </html>
