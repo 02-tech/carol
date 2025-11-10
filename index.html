@@ -2,72 +2,157 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Surpresa para Carol Dutra</title>
+  <title>🎁 Surpresa para Carol Dutra 🎁</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0; padding: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #2d2150 0%, #130d24 80%);
+      color: #fff;
+      font-family: "Segoe UI", sans-serif;
+      height: 100vh;
+    }
+    #petalas {
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+    }
+    .container {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    #giftBox {
+      width: 140px; height: 140px;
+      background: linear-gradient(135deg, #b980fa, #7c4dff);
+      border-radius: 20px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 0 30px #9b5eea99;
+      transition: transform 0.3s ease;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    #giftBox:hover { transform: scale(1.1); }
+    #giftBox::before {
+      content: "";
+      position: absolute; top: 0; left: 50%;
+      width: 16px; height: 100%;
+      background: #fff;
+      transform: translateX(-50%);
+      border-radius: 8px;
+    }
+    #giftBox::after {
+      content: "";
+      position: absolute; top: 50%;
+      left: 0; width: 100%; height: 16px;
+      background: #fff;
+      transform: translateY(-50%);
+      border-radius: 8px;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 25px #a780ff88; }
+      50% { box-shadow: 0 0 40px #caa0ffcc; }
+    }
+    #textoAnimado {
+      display: none;
+      font-size: 1.9rem;
+      max-width: 700px;
+      background: rgba(30, 20, 55, 0.85);
+      border-radius: 22px;
+      box-shadow: 0 0 25px #a175fa55;
+      padding: 34px 28px;
+      text-align: left;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+      animation: fadeIn 1.5s forwards;
+    }
+    .cursor { color: #b980fa; animation: blink 0.7s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0;} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);} }
+    @media (max-width:700px){
+      #textoAnimado{font-size:1.1rem;padding:14px 10px;}
+      #giftBox{width:110px;height:110px;}
+    }
+  </style>
 </head>
 <body>
   <canvas id="petalas"></canvas>
-  <div id="caixa" class="fechada">
-    <div class="tampa"></div>
-    <div class="base"></div>
-  </div>
+  <audio id="musica" src="lofi.mp3" preload="auto"></audio>
 
-  <div class="container" style="display:none">
+  <div class="container">
+    <div id="giftBox" title="Clique para abrir 🎁"></div>
     <div id="textoAnimado"></div>
   </div>
 
-  <audio id="musica" src="lofi.mp3"></audio>
   <script src="petalas.js"></script>
   <script>
-    const frases=[
-      "Surpresa feita para Carol Dutra",
-      "(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva, mas eu ainda tô processando tanta sofisticação!)",
+    const frases = [
+      "Surpresa feita para Carol Dutra 💜",
+      "(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva... ainda tentando decorar!)",
       "",
-      "Hoje é o seu dia — o mais importante do ano, né?",
-      "E olha que sorte: você achou um trevo de quatro folhas. Coincidência? Acho que não.",
+      "Resolvi fazer algo diferente, porque uma mensagem no WhatsApp não mostra o tanto que tem sido bom te conhecer.",
       "",
-      "Desde o cinema até as conversas de madrugada, tudo tem sido leve, engraçado e especial.",
-      "O sorriso, as histórias, até o cansaço pós-treino... viraram parte boa do dia.",
+      "Primeiro: o cinema. Você transformou o simples ato de assistir em um momento meu favorito — talvez porque com você, até o silêncio é confortável.",
       "",
-      "Curte teu dia, Carol. Que a sorte do trevo e as pétalas tragam tudo de bom que você espalha.",
+      "E esse sorriso? Existe alguma lei da física que explique como ele muda o dia de quem tá por perto?",
       "",
-      "— Gui"
+      "As conversas, as brincadeiras, os 'boas' e 'sdds'… viraram parte boa da rotina. E sinceramente, espero que continuem assim.",
+      "",
+      "Hoje é seu dia, mas parece que quem ganhou o presente fui eu por te conhecer.",
+      "",
+      "Curte muito, Carol. 🌿 Que esse novo ciclo venha leve, bonito e cheio de sorte (igual aquele trevo de quatro folhas).",
+      "",
+      "Assinado: o culpado por essa página 😏"
     ];
 
-    const caixa=document.getElementById("caixa");
-    const musica=document.getElementById("musica");
-    const texto=document.getElementById("textoAnimado");
-    const container=document.querySelector(".container");
+    const gift = document.getElementById("giftBox");
+    const texto = document.getElementById("textoAnimado");
+    const musica = document.getElementById("musica");
+    let atual = 0, char = 0, output = "";
 
-    caixa.addEventListener("click",()=>{
-      caixa.classList.add("abrindo");
-      musica.play();
-      setTimeout(()=>{
-        caixa.style.display="none";
-        container.style.display="flex";
-        document.body.classList.add("show");
-        setTimeout(mostrarTexto,500); // fade-in 0.5 s
-      },1200);
+    gift.addEventListener("click", () => {
+      gift.style.display = "none";
+      texto.style.display = "block";
+      setTimeout(() => musica.play(), 500);
+      mostrarFrase();
     });
 
-    let i=0,c=0,out="";
-    function mostrarTexto(){
-      if(i<frases.length){
-        let f=frases[i];
-        if(c<f.length){
-          out+=f.charAt(c);
-          texto.innerHTML=out+"<span class='cursor'>|</span>";
-          c++;
-          setTimeout(mostrarTexto,25);
-        }else{
-          out+="<br><br>";
-          texto.innerHTML=out;
-          c=0;i++;
-          setTimeout(mostrarTexto,f==""?300:800);
+    function mostrarFrase() {
+      if (atual < frases.length) {
+        let frase = frases[atual];
+        if (char < frase.length) {
+          output += frase.charAt(char);
+          texto.innerHTML = output + "<span class='cursor'>|</span>";
+          char++;
+          setTimeout(mostrarFrase, 22);
+        } else {
+          output += "<br><br>";
+          texto.innerHTML = output;
+          char = 0; atual++;
+          setTimeout(mostrarFrase, frase === "" ? 350 : 1000);
         }
+      } else {
+        const evt = new Event("finalTexto");
+        window.dispatchEvent(evt);
+        fadeOutAudio();
       }
     }
+
+    function fadeOutAudio() {
+      let fade = setInterval(() => {
+        if (musica.volume > 0.02) musica.volume -= 0.02;
+        else { musica.volume = 0; clearInterval(fade); }
+      }, 200);
+    }
+
+    // iniciar confetes no final
+    window.addEventListener("finalTexto", () => {
+      window.dispatchEvent(new Event("animationend"));
+    });
   </script>
 </body>
 </html>
