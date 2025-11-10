@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Surpresa para Carol Dutra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="petalas"></canvas>
+  <div id="caixa" class="fechada">
+    <div class="tampa"></div>
+    <div class="base"></div>
+  </div>
+
+  <div class="container" style="display:none">
+    <div id="textoAnimado"></div>
+  </div>
+
+  <audio id="musica" src="lofi.mp3"></audio>
+  <script src="petalas.js"></script>
+  <script>
+    const frases=[
+      "Surpresa feita para Carol Dutra",
+      "(Boatos me disseram que o nome completo é Carolina Dutra da Silveira Deodoro Silva, mas eu ainda tô processando tanta sofisticação!)",
+      "",
+      "Hoje é o seu dia — o mais importante do ano, né?",
+      "E olha que sorte: você achou um trevo de quatro folhas. Coincidência? Acho que não.",
+      "",
+      "Desde o cinema até as conversas de madrugada, tudo tem sido leve, engraçado e especial.",
+      "O sorriso, as histórias, até o cansaço pós-treino... viraram parte boa do dia.",
+      "",
+      "Curte teu dia, Carol. Que a sorte do trevo e as pétalas tragam tudo de bom que você espalha.",
+      "",
+      "— Gui"
+    ];
+
+    const caixa=document.getElementById("caixa");
+    const musica=document.getElementById("musica");
+    const texto=document.getElementById("textoAnimado");
+    const container=document.querySelector(".container");
+
+    caixa.addEventListener("click",()=>{
+      caixa.classList.add("abrindo");
+      musica.play();
+      setTimeout(()=>{
+        caixa.style.display="none";
+        container.style.display="flex";
+        document.body.classList.add("show");
+        setTimeout(mostrarTexto,500); // fade-in 0.5 s
+      },1200);
+    });
+
+    let i=0,c=0,out="";
+    function mostrarTexto(){
+      if(i<frases.length){
+        let f=frases[i];
+        if(c<f.length){
+          out+=f.charAt(c);
+          texto.innerHTML=out+"<span class='cursor'>|</span>";
+          c++;
+          setTimeout(mostrarTexto,25);
+        }else{
+          out+="<br><br>";
+          texto.innerHTML=out;
+          c=0;i++;
+          setTimeout(mostrarTexto,f==""?300:800);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
